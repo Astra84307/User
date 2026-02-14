@@ -3,78 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Fel2kgamer Official App</title>
 
 <style>
 body{
     margin:0;
     background:#0b1a33;
-    font-family:Arial;
-    color:#fff;
+    font-family:Arial, sans-serif;
+    color:white;
 }
 
+/* HEADER */
 header{
-    padding:15px;
+    padding:14px;
     text-align:center;
-    font-size:20px;
+    font-size:18px;
     font-weight:bold;
     color:#00f0ff;
 }
 
+/* SEARCH BAR (SMALL) */
 .search{
-    padding:10px;
+    padding:6px 12px;
 }
-
 .search input{
     width:100%;
-    padding:12px;
-    border-radius:12px;
+    padding:7px 12px;
+    border-radius:20px;
     border:none;
+    font-size:13px;
+    background:#112244;
+    color:#00f0ff;
+    outline:none;
 }
 
+/* CATEGORY TABS */
 .tabs{
     display:flex;
-    overflow-x:auto;
     gap:8px;
-    padding:10px;
+    overflow-x:auto;
+    padding:8px 12px;
 }
-
 .tabs button{
     flex-shrink:0;
-    padding:10px 16px;
+    padding:8px 14px;
     border-radius:20px;
     border:none;
     background:#112244;
     color:#00f0ff;
+    font-size:13px;
 }
-
 .tabs button.active{
     background:#00bfff;
     color:#000;
 }
 
+/* POST CARD */
 .card{
     margin:12px;
-    padding:15px;
+    padding:14px;
     background:#112244;
     border-radius:16px;
 }
-
+.card h3{
+    margin:0;
+    font-size:15px;
+}
+.card p{
+    font-size:13px;
+    opacity:0.9;
+}
 .card img{
     width:100%;
     border-radius:12px;
-    margin-top:10px;
+    margin-top:8px;
 }
 
+/* DOWNLOAD BUTTON (APPSTORE STYLE) */
 .download{
     display:block;
-    margin-top:12px;
+    margin-top:10px;
+    padding:10px;
     text-align:center;
-    padding:12px;
+    border-radius:25px;
     background:linear-gradient(90deg,#00bfff,#00fff0);
     color:#000;
-    border-radius:25px;
     font-weight:bold;
+    font-size:14px;
     text-decoration:none;
 }
 </style>
@@ -84,53 +100,65 @@ header{
 
 <header>Fel2kgamer Official App</header>
 
+<!-- SEARCH -->
 <div class="search">
-<input id="search" placeholder="Search..." onkeyup="searchPost()">
+<input type="text" id="search" placeholder="Search..." onkeyup="searchPost()">
 </div>
 
+<!-- CATEGORIES -->
 <div class="tabs">
-<button class="active" onclick="filter('All',this)">All</button>
-<button onclick="filter('Games',this)">Games</button>
-<button onclick="filter('Apps',this)">Apps</button>
-<button onclick="filter('Tools',this)">Tools</button>
+<button class="active" onclick="filterCat('All',this)">All Apps</button>
+<button onclick="filterCat('Games',this)">Games</button>
+<button onclick="filterCat('Apps',this)">Apps</button>
+<button onclick="filterCat('Tools',this)">Tools</button>
 </div>
 
+<!-- POSTS -->
 <div id="posts"></div>
 
 <script>
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
-let current = "All";
+let currentCategory = "All";
 
+/* RENDER POSTS */
 function render(list){
     let box = document.getElementById("posts");
-    box.innerHTML="";
+    box.innerHTML = "";
     list.forEach(p=>{
-        box.innerHTML+=`
+        box.innerHTML += `
         <div class="card">
-            <b>${p.title}</b>
+            <h3>${p.title}</h3>
             <p>${p.content}</p>
-            ${p.image?`<img src="${p.image}">`:``}
-            <a class="download" href="${p.download_link}" target="_blank">DOWNLOAD</a>
+            ${p.image ? `<img src="${p.image}">` : ``}
+            ${p.download_link ? `<a class="download" href="${p.download_link}" target="_blank">DOWNLOAD</a>` : ``}
         </div>`;
     });
 }
 
-function filter(cat,btn){
-    current=cat;
+/* FILTER CATEGORY */
+function filterCat(cat,btn){
+    currentCategory = cat;
     document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    let list = cat=="All"?posts:posts.filter(p=>p.category==cat);
+
+    let list = posts;
+    if(cat !== "All") list = posts.filter(p=>p.category === cat);
     render(list);
 }
 
+/* SEARCH */
 function searchPost(){
-    let q=document.getElementById("search").value.toLowerCase();
-    let list=posts.filter(p=>p.title.toLowerCase().includes(q));
-    if(current!="All") list=list.filter(p=>p.category==current);
+    let q = document.getElementById("search").value.toLowerCase();
+    let list = posts.filter(p=>p.title.toLowerCase().includes(q));
+    if(currentCategory !== "All"){
+        list = list.filter(p=>p.category === currentCategory);
+    }
     render(list);
 }
 
+/* INIT */
 render(posts);
 </script>
+
 </body>
 </html>
